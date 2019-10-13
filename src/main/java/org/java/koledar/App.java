@@ -40,23 +40,46 @@ public class App extends Application
     	
     	//konfiguracija elementov
     	inputMesec.getItems().addAll(meseci);
-    	inputMesec.setValue(meseci[0]);
     	
     	labelMesec.setText("Mesec: ");
     	labelLeto.setText("Leto: ");
     	
     	//konfiguracija postavitve elementov
     	HBox inputLayout = new HBox(5);
+    	inputLayout.setPadding(new Insets(10));
     	inputLayout.getChildren().addAll(labelMesec,inputMesec,labelLeto,inputLeto);
     	inputLayout.setAlignment(Pos.TOP_CENTER);
     	
     	Koledar calendarLayout = new Koledar();
     	
+    	inputMesec.setValue(meseci[calendarLayout.getMesec()-1]);
+    	inputLeto.setPrefWidth(60);
+    	inputLeto.setText(Integer.toString(calendarLayout.getLeto()));
+    	
+    	inputMesec.setOnAction(new EventHandler<ActionEvent>() {
+    		@Override
+    		public void handle(ActionEvent event) {
+    			String imeMeseca = inputMesec.getValue();
+    			System.out.println(inputMesec.getValue());
+    			int mesec = 0;
+    			for (int i = 0; i < meseci.length; i++) {
+					if (imeMeseca.equals(meseci[i])) {
+						mesec = i;
+						break;
+					}
+					
+				}
+    			System.out.println(mesec);
+    			calendarLayout.setMesec(mesec+1);
+    			
+    		}
+		});
+    	
     	BorderPane baseLayout = new BorderPane();
     	baseLayout.setTop(inputLayout);
     	baseLayout.setCenter(calendarLayout);
     	
-    	Scene scene = new Scene(baseLayout, 500, 300);
+    	Scene scene = new Scene(baseLayout, 440, 230);
     	//konfiguracija imena okna aplikacije
     	primaryStage.setTitle("Koledar");
     	primaryStage.setScene(scene);
