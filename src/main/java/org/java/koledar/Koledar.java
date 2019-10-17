@@ -1,7 +1,10 @@
 package org.java.koledar;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.WeekFields;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -11,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
 public class Koledar extends GridPane{
@@ -22,6 +26,8 @@ public class Koledar extends GridPane{
 	private int mesec;
 	private int leto;
 	private Label[] dneviLabels = new Label[42];
+	private Bralec bralec;
+	private ArrayList<Praznik> prazniki;
 	
 	public Koledar() {
 		this.setPadding(new Insets(5, 5, 10, 10));
@@ -33,6 +39,7 @@ public class Koledar extends GridPane{
 		for(int i=0; i<7; i++) {
 			Label danImeLabel = new Label();
 			danImeLabel.setText(dnevi[i]);
+			danImeLabel.setFont(Font.font(20));
 			this.add(danImeLabel, i, 0);
 		}
 		
@@ -40,6 +47,7 @@ public class Koledar extends GridPane{
 		int stolpec = 0;
 		for (int i = 0; i < dneviLabels.length; i++) {
 			dneviLabels[i] = new Label();
+			dneviLabels[i].setFont(Font.font(20));
 			this.add(dneviLabels[i], stolpec, vrstica);
 			stolpec++;
 			if(stolpec == 7) {
@@ -58,6 +66,9 @@ public class Koledar extends GridPane{
 		leto = datum.getYear();
 		System.out.println(getMesec()+" "+getLeto());
 		
+		bralec = new Bralec();
+		prazniki = bralec.pridobiPraznike();
+		
 		prikaziDneve();
 		
 		
@@ -71,6 +82,7 @@ public class Koledar extends GridPane{
 	
 	public void prikaziDneve() {
 		for (int i = 0; i < dneviLabels.length; i++) {
+			dneviLabels[i].setTextFill(Color.BLACK);
 			dneviLabels[i].setText("");
 		}
 		
@@ -84,6 +96,13 @@ public class Koledar extends GridPane{
 			}
 		}
 		
+		prazniki.forEach( (praznik) -> {
+			int prviDan = datum.getDayOfWeek().getValue()-1;
+			if (mesec == praznik.getMesec()) {
+				dneviLabels[prviDan+praznik.getDan()-1].setTextFill(Color.LIMEGREEN);
+			}
+		});
+		
 	}
 
 	public int getMesec() {
@@ -92,7 +111,7 @@ public class Koledar extends GridPane{
 
 	public void setMesec(int mesec) {
 		this.mesec = mesec;
-		posodobiDatum(mesec, getLeto());
+		posodobiDatum(mesec, leto);
 		prikaziDneve();
 	}
 
@@ -102,6 +121,27 @@ public class Koledar extends GridPane{
 
 	public void setLeto(int leto) {
 		this.leto = leto;
+		posodobiDatum(mesec, leto);
+		prikaziDneve();
+	}
+
+	public String[] getMeseci() {
+		return meseci;
+	}
+	
+	
+	public boolean setDatum(String datumString) {
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d.M.uuuu");
+		try {
+			LocalDate datum = LocalDate.parse(datumString, dateFormatter);
+			posodobiDatum(datum.getMonthValue(), datum.getYear());
+			prikaziDneve();
+			return true;
+			
+		} catch (DateTimeParseException e) {
+			return false;
+		}
+		
 	}
 	
 }
