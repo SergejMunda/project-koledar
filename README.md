@@ -45,5 +45,5 @@ java -jar koledar.jar "files\prazniki.txt"
 ### Zagon aplikacije z .exe datoteko
 1. zaženemo datoteko koledar.exe (JVM ni potrebna)
 
-##Opozorilo
+## Opozorilo
 Aplikacija brez datoteke s prazniki na pravem mestu ne bo delovala!
