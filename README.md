@@ -15,6 +15,8 @@ Namen projekta je razvoj aplikacije, ki prikazuje datume v mescu in letu, ki ga 
 ## Navodila
 Aplikacija se nahaja v mapi `\shade` .
 
+Izvorna koda se nahaja v `src\main\java` .
+
 Vsebino datoteke `prazniki.txt` lahko poljubno spreminjamo,velja:
 ```
 dd.mm.pon - praznik je ponavljajoč
@@ -42,3 +44,6 @@ java -jar koledar.jar "files\prazniki.txt"
 
 ### Zagon aplikacije z .exe datoteko
 1. zaženemo datoteko koledar.exe (JVM ni potrebna)
+
+##Opozorilo
+Aplikacija brez datoteke s prazniki na pravem mestu ne bo delovala!
