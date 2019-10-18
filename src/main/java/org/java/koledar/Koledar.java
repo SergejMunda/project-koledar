@@ -25,24 +25,35 @@ public class Koledar extends GridPane{
 	private LocalDate datum;
 	private int mesec;
 	private int leto;
-	private Label[] dneviLabels = new Label[42];
+	
+	private Label[] dneviLabels;
+	
 	private Bralec bralec;
 	private ArrayList<Praznik> prazniki;
 	
 	public Koledar() {
-		this.setPadding(new Insets(5, 5, 10, 10));
+		
+		//konfiguracija razreda Koledar
+		this.setPadding(new Insets(5, 5, 5, 5));
 		this.setVgap(10);
 		this.setHgap(15);
 		this.setAlignment(Pos.CENTER);
-		
     	
+		//Izpis imen dnevov
 		for(int i=0; i<7; i++) {
 			Label danImeLabel = new Label();
 			danImeLabel.setText(dnevi[i]);
 			danImeLabel.setFont(Font.font(20));
+			if (i == 6) {
+				danImeLabel.setTextFill(Color.RED);
+			}
 			this.add(danImeLabel, i, 0);
 		}
 		
+		//definicija polj za dneve
+		dneviLabels = new Label[42];
+		
+		//postavitev polj za dneve v vrstice in stolpce
 		int vrstica = 1;
 		int stolpec = 0;
 		for (int i = 0; i < dneviLabels.length; i++) {
@@ -55,17 +66,17 @@ public class Koledar extends GridPane{
 				vrstica++;
 			}
 		}
-		 
-		datum = LocalDate.now();
-		System.out.println(datum.getDayOfMonth()+" "+datum.getMonth().getValue()+" "+datum.getYear()+" "+datum.getDayOfWeek().getValue());
-		datum = datum.minusDays(datum.getDayOfMonth()-1);
-		System.out.println(datum.getDayOfMonth()+" "+datum.getMonth().getValue()+" "+datum.getYear()+" "+datum.getDayOfWeek().getValue());
-		//datum = datum.plusMonths(2);
 		
+		//pridobi danasnji datum
+		datum = LocalDate.now();
+		//premik na prvi dan v mescu
+		datum = datum.minusDays(datum.getDayOfMonth()-1);
+		
+		//dodeljevanje vrednosti atributov mesec in leto
 		mesec = datum.getMonthValue();
 		leto = datum.getYear();
-		System.out.println(getMesec()+" "+getLeto());
 		
+		//branje podatkov o praznikih iz datoteke
 		bralec = new Bralec();
 		prazniki = bralec.pridobiPraznike();
 		
@@ -81,25 +92,33 @@ public class Koledar extends GridPane{
 	}
 	
 	public void prikaziDneve() {
+		
+		//brisanje prejsnjih vrednosti
 		for (int i = 0; i < dneviLabels.length; i++) {
 			dneviLabels[i].setTextFill(Color.BLACK);
 			dneviLabels[i].setText("");
 		}
 		
+		//izpis novih vrednosti
 		for(LocalDate tempDatum=datum; tempDatum.isBefore(datum.plusMonths(1)); tempDatum = tempDatum.plusDays(1)) {
-			//System.out.println(tempDatum.toString());
 			int prviDan = datum.getDayOfWeek().getValue()-1;
 			int danVTednu = tempDatum.getDayOfWeek().getValue();
 			dneviLabels[prviDan+tempDatum.getDayOfMonth()-1].setText(Integer.toString(tempDatum.getDayOfMonth()));
+			//barvanje nedelj
 			if(danVTednu >= 7) {
 				dneviLabels[prviDan+tempDatum.getDayOfMonth()-1].setTextFill(Color.RED);
 			}
 		}
 		
+		//barvanje praznikov
 		prazniki.forEach( (praznik) -> {
 			int prviDan = datum.getDayOfWeek().getValue()-1;
 			if (mesec == praznik.getMesec()) {
-				dneviLabels[prviDan+praznik.getDan()-1].setTextFill(Color.LIMEGREEN);
+				if (praznik.getPonovljiv()) {
+					dneviLabels[prviDan+praznik.getDan()-1].setTextFill(Color.LIMEGREEN);
+				}else if(!praznik.getPonovljiv() && leto==praznik.getLeto()) {
+					dneviLabels[prviDan+praznik.getDan()-1].setTextFill(Color.LIMEGREEN);
+				}
 			}
 		});
 		
@@ -131,13 +150,19 @@ public class Koledar extends GridPane{
 	
 	
 	public boolean setDatum(String datumString) {
+		//preverjanje ustreznosti vnosa v polje
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d.M.uuuu");
 		try {
 			LocalDate datum = LocalDate.parse(datumString, dateFormatter);
-			posodobiDatum(datum.getMonthValue(), datum.getYear());
-			prikaziDneve();
-			return true;
-			
+			this.mesec = datum.getMonthValue();
+			if (datum.getYear() >= 1900 && datum.getYear()<=2200) {
+				this.leto = datum.getYear();
+				posodobiDatum(datum.getMonthValue(), datum.getYear());
+				prikaziDneve();
+				return true;
+			} else {
+				throw new DateTimeParseException("Nepravilen datum!",datumString, 0);
+			}
 		} catch (DateTimeParseException e) {
 			return false;
 		}

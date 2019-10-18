@@ -18,134 +18,171 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-public class App extends Application
-{
-    
-	
-	public static void main( String[] args )
-    {
-    	launch(args);
-    }
-    
-	//deklaracija vnosnih polj
-	final Label labelMesec = new Label();
-	final ComboBox<String> inputMesec = new ComboBox<String>();
-	final Label labelLeto = new Label();
-	final TextField inputLeto = new TextField();
-	final Label labelLetoInfo = new Label();
-	final Label labelDatum = new Label();
-	final TextField inputDatum = new TextField();
-	final Label labelDatumInfo = new Label();
-	final Button potrdiLeto = new Button();
-	final Button potrdiDatum = new Button();
-	final String[] meseci = {"Januar","Februar","Marec","April","Maj",
-					"Junij","Julij","Avgust","September","Oktober",
-					"November","December"};
-	
-	
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-    	
-    	//konfiguracija elementov
-    	inputMesec.getItems().addAll(meseci);
-    	
-    	labelMesec.setText("Mesec:");
-    	labelLeto.setText("Leto:");
-    	labelDatum.setText("Datum:");
-    	
-    	potrdiLeto.setText("Potrdi Leto");
-    	potrdiDatum.setText("Potrdi Datum");
-    	
-    	//konfiguracija postavitve elementov
-    	VBox inputLayoutLeft = new VBox(5);
-    	inputLayoutLeft.setPadding(new Insets(10));
-    	inputLayoutLeft.getChildren().addAll(labelMesec,inputMesec,labelLeto,inputLeto, potrdiLeto,labelLetoInfo);
-    	inputLayoutLeft.setAlignment(Pos.CENTER);
-    	
-    	VBox inputLayoutRight = new VBox(5);
-    	inputLayoutRight.setPadding(new Insets(10));
-    	inputLayoutRight.getChildren().addAll(labelDatum,inputDatum,potrdiDatum,labelDatumInfo);
-    	inputLayoutRight.setAlignment(Pos.CENTER);
-    	
-    	Koledar calendarLayout = new Koledar();
-    	
-    	inputMesec.setValue(meseci[calendarLayout.getMesec()-1]);
-    	inputLeto.setPrefWidth(60);
-    	inputLeto.setText(Integer.toString(calendarLayout.getLeto()));
-    	inputDatum.setPrefWidth(100);
-    	
-    	inputMesec.setOnAction(new EventHandler<ActionEvent>() {
-    		@Override
-    		public void handle(ActionEvent event) {
-    			String imeMeseca = inputMesec.getValue();
-    			System.out.println(inputMesec.getValue());
-    			int mesec = 0;
-    			for (int i = 0; i < meseci.length; i++) {
-					if (imeMeseca.equals(meseci[i])) {
+public class App extends Application {
+
+	public static void main(String[] args) {
+		launch(args);
+	}
+
+	// deklaracija vnosnih polj
+	Label labelMesec;
+	ComboBox<String> inputMesec;
+
+	Label labelLeto;
+	TextField inputLeto;
+	Label labelLetoInfo;
+
+	Label labelDatum;
+	TextField inputDatum;
+	Label labelDatumInfo;
+
+	Button potrdiLeto;
+	Button potrdiDatum;
+
+	Label labelTrenutnoPrikazano;
+
+	@Override
+	public void start(Stage okno) throws Exception {
+
+		// konstrukcija razreda Koledar
+		Koledar calendarLayout = new Koledar();
+
+		// definicija in konfiguracija elementa labelMesec
+		labelMesec = new Label();
+		labelMesec.setText("Mesec:");
+
+		// definicija in konfiguracija elementa inputMesec
+		inputMesec = new ComboBox<String>();
+		inputMesec.getItems().addAll(calendarLayout.getMeseci());
+		inputMesec.setValue(calendarLayout.getMeseci()[calendarLayout.getMesec() - 1]);
+		inputMesec.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				String imeMeseca = inputMesec.getValue();
+				int mesec = 0;
+				for (int i = 0; i < calendarLayout.getMeseci().length; i++) {
+					if (imeMeseca.equals(calendarLayout.getMeseci()[i])) {
 						mesec = i;
 						break;
 					}
-					
+
 				}
-    			System.out.println(mesec);
-    			calendarLayout.setMesec(mesec+1);
-    			
-    		}
+				calendarLayout.setMesec(mesec + 1);
+				prikaziTrenutniDatum(calendarLayout);
+
+			}
 		});
-    	
-    	potrdiLeto.setOnAction(new EventHandler<ActionEvent>() {
-    		@Override
-    		public void handle(ActionEvent event) {
-    			
-    			Boolean jeLeto = Pattern.matches("^(19[0-9][0-9]|2[0-1][0-9][0-9]|2200)$", inputLeto.getText());
-    			System.out.println(jeLeto);
-    			
-    			if(jeLeto) {
-    				int leto=Integer.parseInt(inputLeto.getText());
-    				System.out.println(leto);
-    				calendarLayout.setLeto(leto);
-    				labelLetoInfo.setTextFill(Color.SEAGREEN);
-    				labelLetoInfo.setText("Datum posodobljen");
-    				
-    			}else {
-    				labelLetoInfo.setTextFill(Color.RED);
-    				labelLetoInfo.setText("Vnesite leto v\nrazponu 1900-2200!");
+
+		// definicija in konfiguracija elementa labelLeto
+		labelLeto = new Label();
+		labelLeto.setText("Leto:");
+
+		// definicija in konfiguracija elementa inputLeto
+		inputLeto = new TextField();
+		inputLeto.setPrefWidth(60);
+		inputLeto.setText(Integer.toString(calendarLayout.getLeto()));
+
+		// definicija in konfiguracija elementa labelLetoInfo
+		labelLetoInfo = new Label();
+
+		// definicija in konfiguracija elementa labelDatum
+		labelDatum = new Label();
+		labelDatum.setText("Datum:");
+
+		// definicija in konfiguracija elementa inputDatum
+		inputDatum = new TextField();
+		inputDatum.setPrefWidth(100);
+
+		// definicija in konfiguracija elementa labelDatumInfo
+		labelDatumInfo = new Label();
+
+		// definicija in konfiguracija elementa potrdiLeto
+		potrdiLeto = new Button();
+		potrdiLeto.setText("Potrdi Leto");
+		potrdiLeto.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Boolean jeLeto = Pattern.matches("^(19[0-9][0-9]|2[0-1][0-9][0-9]|2200)$", inputLeto.getText());
+				if (jeLeto) {
+					int leto = Integer.parseInt(inputLeto.getText());
+					calendarLayout.setLeto(leto);
+					labelLetoInfo.setTextFill(Color.SEAGREEN);
+					labelLetoInfo.setText("Datum posodobljen");
+					prikaziTrenutniDatum(calendarLayout);
+
+				} else {
+					labelLetoInfo.setTextFill(Color.RED);
+					labelLetoInfo.setText("Vnesite leto v\nrazponu 1900-2200!");
 				}
-    			
-    			
-    			
-    		}
+
+			}
 		});
-    	
-    	potrdiDatum.setOnAction(new EventHandler<ActionEvent>() {
-    		@Override
-    		public void handle(ActionEvent event) {
-    			String datum = inputDatum.getText();
-    			System.out.println(datum);
-    			if(calendarLayout.setDatum(datum)) {
-    				calendarLayout.setDatum(datum);
-    				labelDatumInfo.setTextFill(Color.SEAGREEN);
-    				labelDatumInfo.setText("Datum posodobljen");
-    			}else {
-    				labelDatumInfo.setTextFill(Color.RED);
-    				labelDatumInfo.setText("Uporabite format\ndd.mm.yyyy");
-    			}
-    			
-    		}
+
+		// definicija in konfiguracija elementa potrdiDatum
+		potrdiDatum = new Button();
+		potrdiDatum.setText("Potrdi Datum");
+		potrdiDatum.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				String datum = inputDatum.getText();
+				if (calendarLayout.setDatum(datum)) {
+					labelDatumInfo.setTextFill(Color.SEAGREEN);
+					labelDatumInfo.setText("Datum posodobljen");
+					prikaziTrenutniDatum(calendarLayout);
+				} else {
+					labelDatumInfo.setTextFill(Color.RED);
+					labelDatumInfo.setText("Uporabite format\ndd.mm.yyyy!\n\nVnesite leto v\nrazponu 1900-2200!");
+				}
+
+			}
 		});
-    	
-    	BorderPane baseLayout = new BorderPane();
-    	baseLayout.setLeft(inputLayoutLeft);
-    	baseLayout.setRight(inputLayoutRight);
-    	baseLayout.setCenter(calendarLayout);
-    	
-    	Scene scene = new Scene(baseLayout, 800, 300);
-    	//konfiguracija imena okna aplikacije
-    	primaryStage.setTitle("Koledar");
-    	primaryStage.setScene(scene);
-    	primaryStage.show();
-    	
-    }
+
+		// definicija in konfiguracija elementa labelTrenutnoPrikazano
+		labelTrenutnoPrikazano = new Label();
+		labelTrenutnoPrikazano.setFont(Font.font(20));
+		prikaziTrenutniDatum(calendarLayout);
+
+		// konfiguracija postavitve elementov na levi strani okna
+		VBox inputLayoutLeft = new VBox(5);
+		inputLayoutLeft.setPadding(new Insets(10));
+		inputLayoutLeft.getChildren().addAll(labelMesec, inputMesec, labelLeto, inputLeto, potrdiLeto, labelLetoInfo);
+		inputLayoutLeft.setAlignment(Pos.CENTER);
+
+		// konfiguracija postavitve elementov na desni strani okna
+		VBox inputLayoutRight = new VBox(5);
+		inputLayoutRight.setPadding(new Insets(10));
+		inputLayoutRight.getChildren().addAll(labelDatum, inputDatum, potrdiDatum, labelDatumInfo);
+		inputLayoutRight.setAlignment(Pos.CENTER);
+
+		// konfiguracija postavitve elementov na spodnji strani okna
+		HBox infoLayoutBottom = new HBox(2);
+		infoLayoutBottom.setPadding(new Insets(0, 0, 10, 0));
+		infoLayoutBottom.getChildren().add(labelTrenutnoPrikazano);
+		infoLayoutBottom.setAlignment(Pos.TOP_CENTER);
+
+		// konfiguracija zdruzitve locenih pogledov v celoto
+		BorderPane baseLayout = new BorderPane();
+		baseLayout.setLeft(inputLayoutLeft);
+		baseLayout.setRight(inputLayoutRight);
+		baseLayout.setCenter(calendarLayout);
+		baseLayout.setBottom(infoLayoutBottom);
+
+		// dodajanje celotne postavitve v okno
+		Scene scene = new Scene(baseLayout, 800, 330);
+
+		// konfiguracija okna aplikacije
+		okno.setTitle("Koledar");
+		okno.setResizable(false);
+		okno.setScene(scene);
+		okno.show();
+	}
+
+	// posodabljanje napisa meseca in leta
+	public void prikaziTrenutniDatum(Koledar calendarLayout) {
+		labelTrenutnoPrikazano
+				.setText(calendarLayout.getMeseci()[calendarLayout.getMesec() - 1] + ", " + calendarLayout.getLeto());
+	}
 }

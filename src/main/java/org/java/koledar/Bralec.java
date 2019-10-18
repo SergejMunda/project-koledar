@@ -7,28 +7,32 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Bralec {
+	//bralec txt datoteke
 	BufferedReader reader;
+	
+	//seznam praznikov
 	ArrayList<Praznik> prazniki;
 	
-	public Bralec() {
-		
-	}
+	public Bralec() {}
 	
 	public ArrayList<Praznik> pridobiPraznike(){
+		//poskus dostopa do datoteke
 		try {
 			reader = new BufferedReader(new FileReader("src/main/resources/prazniki.txt"));
 			prazniki = new ArrayList<Praznik>();
 			for (String vrstica = reader.readLine(); vrstica != null; vrstica = reader.readLine()) {
+				//locevanje vrstice s piko
 				String[] poDelih = vrstica.split("\\.");
-				//System.out.println(poDelih[0]+" "+poDelih[1]+" "+poDelih[2]);
+				Praznik praznik;
 				boolean ponovljiv = false;
-				if (poDelih[2].equals("pon")) {
+				if (poDelih[poDelih.length-1].equals("pon")) {
 					ponovljiv = true;
+					praznik = new Praznik(Integer.parseInt(poDelih[0]),Integer.parseInt(poDelih[1]),ponovljiv);
 				}
-				Praznik praznik = new Praznik(Integer.parseInt(poDelih[0]),Integer.parseInt(poDelih[1]),ponovljiv);
+				else {
+					praznik = new Praznik(Integer.parseInt(poDelih[0]),Integer.parseInt(poDelih[1]),Integer.parseInt(poDelih[2]),ponovljiv);
+				}
 				prazniki.add(praznik);
-				//System.out.println(prazniki.get(0).getDan()+" "+prazniki.get(0).getMesec());
-				
 			}
 			
 		} catch (IOException e) {
