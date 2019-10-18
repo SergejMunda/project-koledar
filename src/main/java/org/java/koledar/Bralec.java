@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Bralec {
+	//pot do txt datoteke
+	String filePath;
+	
 	//bralec txt datoteke
 	BufferedReader reader;
 	
@@ -18,7 +21,8 @@ public class Bralec {
 	public ArrayList<Praznik> pridobiPraznike(){
 		//poskus dostopa do datoteke
 		try {
-			reader = new BufferedReader(new FileReader("src/main/resources/prazniki.txt"));
+			setFilePath(App.filePath);
+			reader = new BufferedReader(new FileReader(filePath));
 			prazniki = new ArrayList<Praznik>();
 			for (String vrstica = reader.readLine(); vrstica != null; vrstica = reader.readLine()) {
 				//locevanje vrstice s piko
@@ -39,5 +43,13 @@ public class Bralec {
 			e.printStackTrace();
 		}
 		return prazniki;
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
 	}
 }

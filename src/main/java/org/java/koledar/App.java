@@ -22,10 +22,14 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class App extends Application {
-
+	
 	public static void main(String[] args) {
+		filePath = args[0];
 		launch(args);
 	}
+	
+	//opis poti do datoteke
+	public static String filePath;
 
 	// deklaracija vnosnih polj
 	Label labelMesec;
